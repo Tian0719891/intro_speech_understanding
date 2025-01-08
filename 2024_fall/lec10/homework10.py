@@ -49,3 +49,4 @@ def stft_to_spectrogram(stft):
     spectrogram -= np.amax(spectrogram)  # Normalize to 0dB
     spectrogram = np.clip(spectrogram, -60, 0)  # Clip to [-60, 0] dB
     return spectrogram
+

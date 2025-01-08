@@ -1,7 +1,7 @@
 import numpy as np
 
 def fourier_synthesis(num_harmonics, X, T0):
-    '''
+    """
     Use Fourier synthesis to resynthesize speech from its Fourier transform.
     
     @param:
@@ -11,10 +11,19 @@ def fourier_synthesis(num_harmonics, X, T0):
         
     @result:
     x (np.ndarray(N)): a length-N waveform, resynthesized using Fourier synthesis
-    
-    The Fourier synthesis equation is this:
-    
-    x[n] = (2/N) * sum_{l=1}^{num_harmonics} |X[l*N//T0]| * cos(2*pi*l*n/T0 + angle(X[l*N//T0]))
-    '''
-    raise RuntimeError("You need to change this part")
+    """
+    N = len(X)  # Length of the Fourier transform
+    n = np.arange(N)  # Time indices
+    x = np.zeros(N)  # Initialize the output waveform
 
+    # Fourier synthesis
+    for l in range(1, num_harmonics + 1):
+        harmonic_idx = l * N // T0
+        if harmonic_idx >= N:
+            break  # Stop if the index exceeds the Fourier transform length
+        magnitude = np.abs(X[harmonic_idx])  # Magnitude of the harmonic
+        phase = np.angle(X[harmonic_idx])  # Phase of the harmonic
+        x += magnitude * np.cos(2 * np.pi * l * n / T0 + phase)
+
+    x *= 2 / N  # Normalize the waveform
+    return x
