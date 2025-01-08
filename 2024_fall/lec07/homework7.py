@@ -1,8 +1,8 @@
 import numpy as np
 
 def voiced_excitation(duration, F0, Fs):
-    '''
-    Create voiced speeech excitation.
+    """
+    Create voiced speech excitation.
     
     @param:
     duration (scalar) - length of the excitation, in samples
@@ -10,12 +10,11 @@ def voiced_excitation(duration, F0, Fs):
     Fs (scalar) - sampling frequency, in samples/second
     
     @returns:
-    excitation (np.ndarray) - the excitation signal, such that
-      excitation[n] = -1 if n is an integer multiple of int(np.round(Fs/F0))
-      excitation[n] = 0 otherwise
-    '''
-    excitation = np.zeros(duration) 
-    pass # change this
+    excitation (np.ndarray) - the excitation signal
+    """
+    excitation = np.zeros(duration)
+    period = int(np.round(Fs / F0))
+    excitation[::period] = -1  # Set every 'period' sample to -1
     return excitation
 
 def resonator(x, F, BW, Fs):
@@ -31,8 +30,15 @@ def resonator(x, F, BW, Fs):
     @returns:
     y (np.ndarray(N)) - resonant output
     '''
-    y = np.zeros(len(x)) 
-    pass # change this
+    N = len(x)
+    w0 = 2 * np.pi * F / Fs  # Angular frequency
+    alpha = np.exp(-np.pi * BW / Fs)
+    b = [1 - alpha, 0, 0]
+    a = [1, -2 * alpha * np.cos(w0), alpha ** 2]
+    
+    y = np.zeros(N)
+    for n in range(2, N):
+        y[n] = b[0] * x[n] - a[1] * y[n-1] - a[2] * y[n-2]
     return y
 
 def synthesize_vowel(duration,F0,F1,F2,F3,F4,BW1,BW2,BW3,BW4,Fs):
@@ -55,6 +61,10 @@ def synthesize_vowel(duration,F0,F1,F2,F3,F4,BW1,BW2,BW3,BW4,Fs):
     @returns:
     speech (np.ndarray(samples)) - synthesized vowel
     '''
-    speech = np.zeros(duration) # change this
+    excitation = voiced_excitation(duration, F0, Fs)
+    resonated1 = resonator(excitation, F1, BW1, Fs)
+    resonated2 = resonator(resonated1, F2, BW2, Fs)
+    resonated3 = resonator(resonated2, F3, BW3, Fs)
+    speech = resonator(resonated3, F4, BW4, Fs)
     return speech
     

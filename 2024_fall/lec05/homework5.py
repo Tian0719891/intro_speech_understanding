@@ -19,4 +19,3 @@ def sine_and_cosine(t_start, t_end, t_steps):
     x = np.cos(t)
     y = np.sin(t)
     return t, x, y
-
